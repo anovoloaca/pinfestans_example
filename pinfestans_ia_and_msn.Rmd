@@ -1,0 +1,91 @@
+---
+title: "Index of Assocation and Minimum Spanning Network Analysis"
+author: "Zhian N. Kamvar"
+date: "July 10, 2016"
+output: word_document
+bibliography: bibliography.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      fig.width = 10,
+                      fig.height = 10)
+options(width = 100)
+```
+
+
+In this analysis, I am analyzing 86 samples of *Phytophthora infestans* from
+North America and South America genotyped at 11 microsattelite loci. Note, that
+some of these samples appear to be triploid. I will be asessing clonality by
+calculating the standardized index of association ($\bar{r}_d$)
+[@agapow2001indices] and showing population structure by creating a minimum
+spanning network from Bruvo's genetic distance [@bruvo2004simple].
+
+I used the R package *poppr* version 2.2.0 to perform the analysis, The minimum spanning network was constructed with *igraph* version 1.0.1, The figures were constructed with *ggplot2* version 2.1.0. 
+
+```{r packages, message = FALSE}
+library('poppr')
+library('ggplot2')
+library('RColorBrewer')
+```
+
+To read in the data, I used `read.genalex()` function from *poppr*, specifying a ploidy of "3". Because Bruvo's distance requires knowledge of repeat lengths, I supplied them for each locus and then ensured that they were consistent with the *poppr* function `fix_replen()`.
+
+```{r data_setup}
+pinf <- read.genalex("pinfestans_mx_sa.csv", ploidy = 3)
+splitStrata(pinf) <- ~Continent/Country
+setPop(pinf) <- ~Continent
+pinfreps <- c(Pi02 = 2, D13 = 2, Pi33 = 6, Pi04 = 2, Pi4B = 2, Pi16 = 2,
+              G11 = 2, Pi56 = 2, Pi63 = 3, Pi70 = 3, Pi89 = 2)
+pinfreps <- fix_replen(pinf, pinfreps)
+```
+
+I used the function `poppr()` to calculate the index of assocation for both North American and South American populations, this was done for total populations and clone-corrected at the country level. To assess significance, alleles were shuffled at each locus independently 999 times. 
+
+```{r ia_analysis, fig.show='hide'}
+set.seed(20160730)
+set.seed(20160730)
+res <- poppr(pinf, sample = 99, quiet = TRUE,
+             H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
+             total = FALSE)
+res_cc <- poppr(pinf, sample = 99, clonecorrect = TRUE, quiet = TRUE,
+             H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
+             strata = ~Continent/Country, keep = 1, total = FALSE)
+knitr::kable(res, digits = 2, caption = "Total Data Set")
+knitr::kable(res_cc, digits = 2, caption = "Clone Corrected Data")
+p <- last_plot() -> op
+```
+
+```{r ia_plot}
+p <- p + facet_wrap(~population, ncol = 1, scales = "free")
+p <- p + theme_bw() # initial theme
+p <- p + theme(text = element_text(size = rel(5))) # make everything bigger
+p <- p + theme(plot.title = element_text(size = rel(4))) # make the title bigger
+p <- p + theme(axis.ticks.y = element_blank()) # remove y axis
+p <- p + theme(axis.text.y = element_blank())  # remove y axis
+p <- p + theme(strip.background = element_blank()) # remove facet label backgrounds
+p <- p + theme(strip.text = element_text(face = "bold")) # make facet labels bold
+p <- p + theme(panel.grid = element_blank()) # remove gridlines
+p <- p + labs(title = "Index of Assocation for clone-corrected data")
+p <- p + labs(y = NULL)
+p
+```
+
+
+
+```{r msn_plot}
+setPop(pinf) <- ~Country
+min_span_net <- bruvo.msn(pinf, replen = pinfreps, add = TRUE, loss = FALSE,
+                          showplot = FALSE, include.ties = TRUE)
+set.seed(70)
+plot_poppr_msn(pinf,
+               min_span_net,
+               inds = "none",
+               mlg = FALSE,
+               gadj = 6,
+               nodebase = 1.15,
+               palette = RColorBrewer::brewer.pal(4, "Set1"),
+               cutoff = NULL,
+               quantiles = FALSE,
+               beforecut = TRUE)
+```
