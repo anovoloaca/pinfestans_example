@@ -53,7 +53,8 @@ res_cc <- poppr(pinf, sample = 99, clonecorrect = TRUE, quiet = TRUE,
              strata = ~Continent/Country, keep = 1, total = FALSE)
 knitr::kable(res, digits = 2, caption = "Total Data Set")
 knitr::kable(res_cc, digits = 2, caption = "Clone Corrected Data")
-p <- last_plot() -> op
+p <- last_plot()
+op <- p # save the original plot
 ```
 
 ```{r ia_plot}
