@@ -2,7 +2,7 @@
 title: "Index of Assocation and Minimum Spanning Network Analysis"
 author: "Zhian N. Kamvar"
 date: "July 10, 2016"
-output: word_document
+output: html_document
 bibliography: bibliography.bib
 ---
 
