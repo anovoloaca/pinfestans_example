@@ -2,14 +2,14 @@
 title: "*P. infestans* Index of Assocation and Minimum Spanning Network Analysis"
 author: "Zhian N. Kamvar"
 date: "July 10, 2016"
-output: 
+output:
   html_document:
     keep_md: true
 bibliography: bibliography.bib
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE,
+knitr::opts_chunk$set(echo = TRUE,
                       fig.width = 10,
                       fig.height = 10)
 options(width = 100)
@@ -55,17 +55,16 @@ North American and South American populations, this was done for total
 populations and clone-corrected at the country level. To assess significance,
 alleles were shuffled at each locus independently 999 times.
 
-```{r ia_analysis, fig.show='hide'}
-set.seed(20160730)
+```{r ia_analysis, fig.show='hide', results = 'asis'}
 set.seed(20160730)
 res <- poppr(pinf, sample = 999, quiet = TRUE,
              H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
              total = FALSE)
+set.seed(20160730)
 res_cc <- poppr(pinf, sample = 999, clonecorrect = TRUE, quiet = TRUE,
              H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
              strata = ~Continent/Country, keep = 1, total = FALSE)
 knitr::kable(res, digits = 2, caption = "Total Data Set")
-cat("\n") # for a space between the tables
 knitr::kable(res_cc, digits = 2, caption = "Clone Corrected Data")
 p <- last_plot()
 op <- p # save the original plot
