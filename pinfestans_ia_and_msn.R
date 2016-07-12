@@ -1,9 +1,3 @@
-## ----setup, include=FALSE------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE,
-                      fig.width = 10,
-                      fig.height = 10)
-options(width = 100)
-
 ## ----packages, message = FALSE-------------------------------------------
 library('poppr')
 library('ggplot2')
