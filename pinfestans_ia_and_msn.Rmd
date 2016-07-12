@@ -1,5 +1,5 @@
 ---
-title: "Index of Assocation and Minimum Spanning Network Analysis"
+title: "*P. infestans* Index of Assocation and Minimum Spanning Network Analysis"
 author: "Zhian N. Kamvar"
 date: "July 10, 2016"
 output: html_document
@@ -15,14 +15,16 @@ options(width = 100)
 
 # Introduction
 
-In this analysis, I am analyzing 86 samples of *Phytophthora infestans* from
-North America and South America genotyped at 11 microsattelite loci. Note, that
-some of these samples appear to be triploid. I will be asessing clonality by
-calculating the standardized index of association ($\bar{r}_d$)
-[@agapow2001indices] and showing population structure by creating a minimum
+In this analysis, I am analyzing 86 samples of *Phytophthora infestans* from 
+North America and South America genotyped at 11 microsattelite loci. Note, that 
+some of these samples appear to be triploid. I will be asessing clonality by 
+calculating the standardized index of association ($\bar{r}_d$) 
+[@agapow2001indices] and showing population structure by creating a minimum 
 spanning network from Bruvo's genetic distance [@bruvo2004simple].
 
-I used the R package *poppr* version 2.2.0 to perform the analysis, The minimum spanning network was constructed with *igraph* version 1.0.1, The figures were constructed with *ggplot2* version 2.1.0. 
+I used the R package *poppr* version 2.2.0 to perform the analysis, The minimum
+spanning network was constructed with *igraph* version 1.0.1, The figures were
+constructed with *ggplot2* version 2.1.0.
 
 ```{r packages, message = FALSE}
 library('poppr')
@@ -30,7 +32,10 @@ library('ggplot2')
 library('RColorBrewer')
 ```
 
-To read in the data, I used `read.genalex()` function from *poppr*, specifying a ploidy of "3". Because Bruvo's distance requires knowledge of repeat lengths, I supplied them for each locus and then ensured that they were consistent with the *poppr* function `fix_replen()`.
+To read in the data, I used `read.genalex()` function from *poppr*, specifying a
+ploidy of "3". Because Bruvo's distance requires knowledge of repeat lengths, I
+supplied them for each locus and then ensured that they were consistent with the
+*poppr* function `fix_replen()`.
 
 ```{r data_setup}
 pinf <- read.genalex("pinfestans_mx_sa.csv", ploidy = 3)
@@ -43,15 +48,18 @@ pinfreps <- fix_replen(pinf, pinfreps)
 
 # Index of Assocation
 
-I used the function `poppr()` to calculate the index of assocation for both North American and South American populations, this was done for total populations and clone-corrected at the country level. To assess significance, alleles were shuffled at each locus independently 999 times.
+I used the function `poppr()` to calculate the index of assocation for both
+North American and South American populations, this was done for total
+populations and clone-corrected at the country level. To assess significance,
+alleles were shuffled at each locus independently 999 times.
 
 ```{r ia_analysis, fig.show='hide'}
 set.seed(20160730)
 set.seed(20160730)
-res <- poppr(pinf, sample = 99, quiet = TRUE,
+res <- poppr(pinf, sample = 999, quiet = TRUE,
              H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
              total = FALSE)
-res_cc <- poppr(pinf, sample = 99, clonecorrect = TRUE, quiet = TRUE,
+res_cc <- poppr(pinf, sample = 999, clonecorrect = TRUE, quiet = TRUE,
              H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
              strata = ~Continent/Country, keep = 1, total = FALSE)
 knitr::kable(res, digits = 2, caption = "Total Data Set")
@@ -60,7 +68,12 @@ p <- last_plot()
 op <- p # save the original plot
 ```
 
-The results show that there is no evidence for linkage in the North American population while there is significant linkage in the South American population for the clone-corrected data set, suggesting a mainly sexual mode of reproduction for the North American population. I then used the *ggplot2* package to plot the results of the randomization procedure on the clone-corrected data as a histogram.
+The results show that there is no evidence for linkage in the North American
+population while there is significant linkage in the South American population
+for the clone-corrected data set, suggesting a mainly sexual mode of
+reproduction for the North American population. I then used the *ggplot2*
+package to plot the results of the randomization procedure on the
+clone-corrected data as a histogram.
 
 ```{r ia_plot}
 p <- p + facet_wrap(~population, ncol = 1, scales = "free")
@@ -79,9 +92,17 @@ p
 
 # Minimum Spanning Network
 
-To display the diversity of the population, I used the packages *poppr* and *igraph* to construct a minimum spanning network from Bruvo's distance using a genome addition model [@bruvo2004simple]. This was initially constructed visually using the function `imsn()` and then the code from the "Command" tab was copied and pasted to reproduce the plot. Before plotting, population was set to Country. 
+To display the diversity of the population, I used the packages *poppr* and
+*igraph* to construct a minimum spanning network from Bruvo's distance using a
+genome addition model [@bruvo2004simple]. This was initially constructed
+visually using the function `imsn()` and then the code from the "Command" tab
+was copied and pasted to reproduce the plot. Before plotting, population was set
+to Country.
 
-In the plot, nodes represent multilocus genotypes, whose sizes are scaled relative to the number of samples in each. Node colors represent population membership and thicker, darker-shaded lines represent closer genetic connections between nodes. 
+In the plot, nodes represent multilocus genotypes, whose sizes are scaled
+relative to the number of samples in each. Node colors represent population
+membership and thicker, darker-shaded lines represent closer genetic connections
+between nodes.
 
 
 ```{r msn_plot}
