@@ -1,15 +1,37 @@
+## ----setup, include=FALSE------------------------------------------------
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.width = 10,
+                      fig.height = 10)
+options(width = 100)
+
+## ----packages, message = FALSE-------------------------------------------
 library('poppr')
-library('ape')
 library('ggplot2')
+library('RColorBrewer')
+
+## ----data_setup----------------------------------------------------------
 pinf <- read.genalex("pinfestans_mx_sa.csv", ploidy = 3)
 splitStrata(pinf) <- ~Continent/Country
-setPop(pinf) <- ~Country
+setPop(pinf) <- ~Continent
+pinfreps <- c(Pi02 = 2, D13 = 2, Pi33 = 6, Pi04 = 2, Pi4B = 2, Pi16 = 2,
+              G11 = 2, Pi56 = 2, Pi63 = 3, Pi70 = 3, Pi89 = 2)
+pinfreps <- fix_replen(pinf, pinfreps)
 
+## ----ia_analysis, fig.show='hide', results = 'asis'----------------------
 set.seed(20160730)
-res <- poppr(pinf, sample = 999, clonecorrect = TRUE,
+res <- poppr(pinf, sample = 999, quiet = TRUE,
+             H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
+             total = FALSE)
+set.seed(20160730)
+res_cc <- poppr(pinf, sample = 999, clonecorrect = TRUE, quiet = TRUE,
+             H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
              strata = ~Continent/Country, keep = 1, total = FALSE)
-p <- last_plot() -> op
+knitr::kable(res, digits = 2, caption = "Total Data Set")
+knitr::kable(res_cc, digits = 2, caption = "Clone Corrected Data")
+p <- last_plot()
+op <- p # save the original plot
 
+## ----ia_plot-------------------------------------------------------------
 p <- p + facet_wrap(~population, ncol = 1, scales = "free")
 p <- p + theme_bw() # initial theme
 p <- p + theme(text = element_text(size = rel(5))) # make everything bigger
@@ -23,10 +45,8 @@ p <- p + labs(title = "Index of Assocation for clone-corrected data")
 p <- p + labs(y = NULL)
 p
 
-pinfreps <- c(Pi02 = 2, D13 = 2, Pi33 = 6, Pi04 = 2, Pi4B = 2, Pi16 = 2,
-              G11 = 2, Pi56 = 2, Pi63 = 3, Pi70 = 3, Pi89 = 2)
-pinfreps <- fix_replen(pinf, pinfreps)
-
+## ----msn_plot------------------------------------------------------------
+setPop(pinf) <- ~Country
 min_span_net <- bruvo.msn(pinf, replen = pinfreps, add = TRUE, loss = FALSE,
                           showplot = FALSE, include.ties = TRUE)
 set.seed(70)
@@ -40,3 +60,7 @@ plot_poppr_msn(pinf,
                cutoff = NULL,
                quantiles = FALSE,
                beforecut = TRUE)
+
+## ----session_information-------------------------------------------------
+devtools::session_info()
+
