@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = FALSE,
 options(width = 100)
 ```
 
+# Introduction
 
 In this analysis, I am analyzing 86 samples of *Phytophthora infestans* from
 North America and South America genotyped at 11 microsattelite loci. Note, that
@@ -40,7 +41,9 @@ pinfreps <- c(Pi02 = 2, D13 = 2, Pi33 = 6, Pi04 = 2, Pi4B = 2, Pi16 = 2,
 pinfreps <- fix_replen(pinf, pinfreps)
 ```
 
-I used the function `poppr()` to calculate the index of assocation for both North American and South American populations, this was done for total populations and clone-corrected at the country level. To assess significance, alleles were shuffled at each locus independently 999 times. 
+# Index of Assocation
+
+I used the function `poppr()` to calculate the index of assocation for both North American and South American populations, this was done for total populations and clone-corrected at the country level. To assess significance, alleles were shuffled at each locus independently 999 times.
 
 ```{r ia_analysis, fig.show='hide'}
 set.seed(20160730)
@@ -57,6 +60,8 @@ p <- last_plot()
 op <- p # save the original plot
 ```
 
+The results show that there is no evidence for linkage in the North American population while there is significant linkage in the South American population for the clone-corrected data set, suggesting a mainly sexual mode of reproduction for the North American population. I then used the *ggplot2* package to plot the results of the randomization procedure on the clone-corrected data as a histogram.
+
 ```{r ia_plot}
 p <- p + facet_wrap(~population, ncol = 1, scales = "free")
 p <- p + theme_bw() # initial theme
@@ -72,6 +77,11 @@ p <- p + labs(y = NULL)
 p
 ```
 
+# Minimum Spanning Network
+
+To display the diversity of the population, I used the packages *poppr* and *igraph* to construct a minimum spanning network from Bruvo's distance using a genome addition model [@bruvo2004simple]. This was initially constructed visually using the function `imsn()` and then the code from the "Command" tab was copied and pasted to reproduce the plot. Before plotting, population was set to Country. 
+
+In the plot, nodes represent multilocus genotypes, whose sizes are scaled relative to the number of samples in each. Node colors represent population membership and thicker, darker-shaded lines represent closer genetic connections between nodes. 
 
 
 ```{r msn_plot}
@@ -90,3 +100,13 @@ plot_poppr_msn(pinf,
                quantiles = FALSE,
                beforecut = TRUE)
 ```
+
+# R environment
+
+The following packages were used in this analysis.
+
+```{r session_information}
+devtools::session_info()
+```
+
+# References
