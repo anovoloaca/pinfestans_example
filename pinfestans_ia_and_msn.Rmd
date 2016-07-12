@@ -2,7 +2,9 @@
 title: "*P. infestans* Index of Assocation and Minimum Spanning Network Analysis"
 author: "Zhian N. Kamvar"
 date: "July 10, 2016"
-output: html_document
+output: 
+  html_document:
+    keep_md: true
 bibliography: bibliography.bib
 ---
 
@@ -63,6 +65,7 @@ res_cc <- poppr(pinf, sample = 999, clonecorrect = TRUE, quiet = TRUE,
              H = FALSE, G = FALSE, lambda = FALSE, E5 = FALSE,
              strata = ~Continent/Country, keep = 1, total = FALSE)
 knitr::kable(res, digits = 2, caption = "Total Data Set")
+cat("\n") # for a space between the tables
 knitr::kable(res_cc, digits = 2, caption = "Clone Corrected Data")
 p <- last_plot()
 op <- p # save the original plot
